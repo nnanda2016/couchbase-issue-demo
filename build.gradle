@@ -73,7 +73,7 @@ task runApp(type: JavaExec) {
 	doLast {
 		String logFileContent = new File('./build/logs/demo-app.log').getText('UTF-8');
 		println '======== LOG FILE CONTENT ========'
-		println logFileContent
+		print logFileContent
 		println '=================='
 		
 	}
