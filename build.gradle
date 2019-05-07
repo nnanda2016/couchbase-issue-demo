@@ -16,7 +16,8 @@ repositories {
 
 ext {
 	dcp_client_version = "0.22.0"
-	couchbase_client_version = "2.5.9"
+	bad_couchbase_client_version = "2.5.9"
+	good_couchbase_client_version = "2.7.4"
 	commons_collections4_version = "4.1"
 	commons_lang3_version = "3.8.1"
     guava_version = "25.1-jre"
@@ -35,7 +36,14 @@ configurations {
 }
 
 dependencies {
-	compile "com.couchbase.client:java-client:${couchbase_client_version}"
+	if (project.hasProperty('withErr')) {
+	    compile "com.couchbase.client:java-client:${bad_couchbase_client_version}"
+	    println ">>>>> CB SDK version in use: ${bad_couchbase_client_version}"
+	} else {
+		compile "com.couchbase.client:java-client:${good_couchbase_client_version}"
+		println ">>>>> CB SDK version in use: ${good_couchbase_client_version}"
+	}
+	
 	compile "com.couchbase.client:dcp-client:${dcp_client_version}"
     
 	compile "com.google.guava:guava:${guava_version}"
@@ -59,8 +67,14 @@ task runApp(type: JavaExec) {
 	classpath = sourceSets.main.runtimeClasspath
 	jvmArgs = [
 		'-XX:+UseStringDeduplication',
-		'-Xdebug',
-		'-Xrunjdwp:transport=dt_socket,address=8802,server=y,suspend=n',
 		'-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector'
 	]
+	
+	doLast {
+		String logFileContent = new File('./build/logs/demo-app.log').getText('UTF-8');
+		println '======== LOG FILE CONTENT ========'
+		println logFileContent
+		println '=================='
+		
+	}
 }
