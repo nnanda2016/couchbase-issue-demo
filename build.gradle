@@ -1,0 +1,66 @@
+apply plugin: "maven"
+apply plugin: "eclipse"
+
+apply plugin: 'java'
+
+sourceCompatibility = java_version_compatibility
+targetCompatibility = java_version_compatibility
+
+// Repositories to work with
+repositories {
+	// Local Maven Repo
+	mavenLocal()
+	mavenCentral()
+	
+}
+
+ext {
+	dcp_client_version = "0.22.0"
+	couchbase_client_version = "2.5.9"
+	commons_collections4_version = "4.1"
+	commons_lang3_version = "3.8.1"
+    guava_version = "25.1-jre"
+	
+	// Logging related
+	slf4j_version = "1.7.25"
+	log4j2_version = "2.11.0"
+	lmax_disruptor_version = "3.4.2"
+}
+
+configurations {
+	compile.exclude module: 'slf4j-log4j12'
+	
+	compile.exclude group: 'ch.qos.cal10n'
+	compile.exclude group: 'ch.qos.logback'
+}
+
+dependencies {
+	compile "com.couchbase.client:java-client:${couchbase_client_version}"
+	compile "com.couchbase.client:dcp-client:${dcp_client_version}"
+    
+	compile "com.google.guava:guava:${guava_version}"
+	compile "org.apache.commons:commons-lang3:${commons_lang3_version}"
+	compile "org.apache.commons:commons-collections4:${commons_collections4_version}"
+	
+	// Logging related
+	compile "org.slf4j:slf4j-api:${slf4j_version}"
+	compile "org.slf4j:slf4j-ext:${slf4j_version}"
+	compile "org.slf4j:jcl-over-slf4j:${slf4j_version}"
+	compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j2_version}"
+    compile "org.apache.logging.log4j:log4j-api:${log4j2_version}"
+    compile "org.apache.logging.log4j:log4j-core:${log4j2_version}"
+    compile "org.apache.logging.log4j:log4j-web:${log4j2_version}"
+    compile "org.apache.logging.log4j:log4j-slf4j-impl:${log4j2_version}"
+    compile "com.lmax:disruptor:${lmax_disruptor_version}"
+}
+
+task runApp(type: JavaExec) {
+	main = 'com.demo.CouchbaseIssueDemo'
+	classpath = sourceSets.main.runtimeClasspath
+	jvmArgs = [
+		'-XX:+UseStringDeduplication',
+		'-Xdebug',
+		'-Xrunjdwp:transport=dt_socket,address=8802,server=y,suspend=n',
+		'-DLog4jContextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector'
+	]
+}
